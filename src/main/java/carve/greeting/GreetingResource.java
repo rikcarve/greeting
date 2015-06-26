@@ -33,9 +33,8 @@ public class GreetingResource {
             curatorFramework.start();
             ServiceInstance<Object> serviceInstance = ServiceInstance.builder()
                     .uriSpec(new UriSpec("{scheme}://{address}:{port}"))
-                    .address("localhost").port(port).name("worker").build();
-            ServiceDiscoveryBuilder.builder(Object.class)
-                    .basePath("load-balancing-example")
+                    .address("localhost").port(port).name("greeting").build();
+            ServiceDiscoveryBuilder.builder(Object.class).basePath("carve")
                     .client(curatorFramework).thisInstance(serviceInstance)
                     .build().start();
         } catch (Exception e) {
