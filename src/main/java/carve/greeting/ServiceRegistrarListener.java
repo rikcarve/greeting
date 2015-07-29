@@ -1,5 +1,6 @@
 package carve.greeting;
 
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 
 import javax.management.ObjectName;
@@ -10,6 +11,7 @@ import javax.servlet.annotation.WebListener;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryNTimes;
+import org.apache.curator.x.discovery.ServiceDiscovery;
 import org.apache.curator.x.discovery.ServiceDiscoveryBuilder;
 import org.apache.curator.x.discovery.ServiceInstance;
 import org.apache.curator.x.discovery.UriSpec;
@@ -17,8 +19,15 @@ import org.apache.curator.x.discovery.UriSpec;
 @WebListener
 public class ServiceRegistrarListener implements ServletContextListener {
 
+    ServiceDiscovery<Object> serviceDiscovery;
+
     @Override
     public void contextDestroyed(ServletContextEvent arg0) {
+        try {
+            serviceDiscovery.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -38,9 +47,11 @@ public class ServiceRegistrarListener implements ServletContextListener {
             ServiceInstance<Object> serviceInstance = ServiceInstance.builder()
                     .uriSpec(new UriSpec("{scheme}://{address}:{port}"))
                     .address("localhost").port(port).name("greeting").build();
-            ServiceDiscoveryBuilder.builder(Object.class).basePath("carve")
+            serviceDiscovery = ServiceDiscoveryBuilder.builder(Object.class)
+                    .basePath("carve")
                     .client(curatorFramework).thisInstance(serviceInstance)
-                    .build().start();
+                    .build();
+            serviceDiscovery.start();
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Curator reg failed");
