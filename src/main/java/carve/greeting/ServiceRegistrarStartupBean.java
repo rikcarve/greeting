@@ -59,6 +59,7 @@ public class ServiceRegistrarStartupBean {
             CuratorFramework curatorFramework = CuratorFrameworkFactory
                     .newClient("localhost:2181", new RetryNTimes(5, 1000));
             curatorFramework.start();
+            // TODO make "greeting" injectable
             ServiceInstance<Object> serviceInstance = ServiceInstance.builder()
                     .uriSpec(new UriSpec("{scheme}://{address}:{port}"))
                     .address("localhost").port(port).name("greeting").build();
