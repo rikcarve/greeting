@@ -50,10 +50,7 @@ public class ServiceRegistrarStartupBean {
         try {
             int port = (int) ManagementFactory
                     .getPlatformMBeanServer()
-                    .getAttribute(
-                            new ObjectName(
-                                    "jboss.as:socket-binding-group=standard-sockets,socket-binding=http"),
-                            "boundPort");
+                    .getAttribute(new ObjectName("jboss.as:socket-binding-group=standard-sockets,socket-binding=http"), "boundPort");
             System.out.println("HTTP port: " + port);
 
             CuratorFramework curatorFramework = CuratorFrameworkFactory
@@ -68,12 +65,12 @@ public class ServiceRegistrarStartupBean {
                     .client(curatorFramework).thisInstance(serviceInstance)
                     .build();
             serviceDiscovery.start();
+            System.out.println("Service registered in Curator/Zookeeper");
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Curator reg failed");
             // try again
             timerService.createTimer(2000, "Startup service registrar timer");
         }
-        System.out.println("Service registered in Curator/Zookeeper");
     }
 }
